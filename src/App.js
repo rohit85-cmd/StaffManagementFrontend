@@ -4,24 +4,24 @@ import StaffList from './Components/StaffList'
 import logo from './logo.svg';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import FileUpload from './Components/FileUpload';
+import UploadAndMigrate from './Components/UploadAndMigrate';
 import { ToastContainer } from 'react-toastify';
+import FileUpload from './Components/FileUpload';
+
+import {Route, Routes } from 'react-router-dom'
+
 
 function App() {
     return (
-        <>
+        <div className="App App-header">
             <ToastContainer />
-            <div className="App">
-
-                <header className="App-header">
-
-                    <FileUpload />
-                    {/*<MappingUI />
-              <StaffList/>*/}
-
-                </header>
-            </div>
-        </>
+            <Routes>
+                <Route path="/" element={<FileUpload />} />
+                <Route path="/mapper" element={<MappingUI />} />
+                
+            </Routes>
+        </div>
+        
     );
 }
 

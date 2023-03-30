@@ -3,12 +3,31 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
 
 function MappingUI() {
-    //const [leftValue, setLeftValue] = useState('');
-    const [rightValue, setRightValue] = useState('');
+    
 
     const [dbFields, setDbFields] = useState([]);
+    
+    const location = useLocation();
+    const csvFields = location.state.csvFields;
+    console.log(csvFields);
+    const fileName = location.state.fileName;
+    console.log(fileName);
+    const [selectedValues, setSelectedValues] = useState({});
+
+    function handleSelectChange(event, field) {
+        const newSelectedValues = { ...selectedValues };
+        newSelectedValues[field] = event.target.value;
+        setSelectedValues(newSelectedValues);
+    }
+
+    
+
 
     useEffect(() => {
         fetch('https://localhost:7096/api/staffAPI/headers')
@@ -17,17 +36,32 @@ function MappingUI() {
     }, []);
 
 
+    const handleMapClick = async(e) => {
+        //console.log(selectedValues);
+        try {
+            console.log("Selcted Values: ", selectedValues);
 
-    /*function handleLeftChange(event) {
-        setLeftValue(event.target.value);
-    }*/
+            var response = await axios.post("https://localhost:7096/api/staffAPI/migrate/" + fileName, selectedValues);
+            if (response.status === 200) {
+                console.log("migration Successful");
+                toast.success('Data Migrated to sql table', {
+                    autoClose: 1000,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    theme: "dark",
+                });
+            }
 
-    function handleRightChange(event) {
-        setRightValue(event.target.value);
-    }
-
-    function handleMapClick() {
-        //setRightValue(leftValue);
+        } 
+        catch (error) {
+            console.log(error.message);
+            toast.error(error.message, {
+                autoClose: 1000,
+                closeOnClick: true,
+                pauseOnHover: false,
+                theme: "dark", 
+            });
+        }
     }
 
     return (
@@ -41,12 +75,16 @@ function MappingUI() {
                             <label key={index} value={field}>{field}</label>
                         </Col>
                         <Col>
-                            {/*<input type="text" value={rightValue} onChange={handleRightChange} />*/}
-                            <select>
-                                <option>select option</option>
-                                <option value="1">One</option>
-                                <option value="2">Two</option>
-                                <option value="3">Three</option>
+                            
+                            <select value={selectedValues[field]} onChange={(e) => handleSelectChange(e, field)}>
+                                <option>--Select Option--</option>
+                              
+
+                                {csvFields.map((field, index) => (
+                                    <option key={index} value={field} disabled={Object.values(selectedValues).includes(field)}>{field}</option>
+                                ))} 
+                                
+                                
                             </select>
                         </Col>
                     </Row>
