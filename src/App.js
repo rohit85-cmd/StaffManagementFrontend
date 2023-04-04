@@ -9,6 +9,7 @@ import { ToastContainer } from 'react-toastify';
 import FileUpload from './Components/FileUpload';
 
 import {Route, Routes } from 'react-router-dom'
+import StaffRecords from './Components/StaffRecords';
 
 
 function App() {
@@ -18,6 +19,8 @@ function App() {
             <Routes>
                 <Route path="/" element={<FileUpload />} />
                 <Route path="/mapper" element={<MappingUI />} />
+                <Route path="/migratedStaff" element={<StaffRecords />} />
+
                 
             </Routes>
         </div>

@@ -1,6 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\src",
+    "\\src\\Components"
   ],
+  "SelectedNode": "\\src\\Components\\StaffList.js",
   "PreviewInSolutionExplorer": false
 }
