@@ -4,30 +4,52 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-import MappingUI from './MappingUI';
-import StaffRecords from './StaffRecords';
-import Loader from './Loader';
-import { Form } from 'react-bootstrap';
+import Card from 'react-bootstrap/Card';
+import UploadUi from './UploadUi/UploadUi';
+import FileProgressBar from './FileProgressBar/FileProgressBar';
+import ProgressBar from 'react-bootstrap/ProgressBar';
 
 function FileUpload() {
     const [file, setFile] = useState();
     const [fileName, setFileName] = useState('')
-    const [fileType, setFileType] = useState('')
+    const [fileSize, setFileSize] = useState('')
     const [fileState, setFileState] = useState(false)
     const [result, setResult] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
-    
-
+    const [isLoading, setIsLoading] = useState(true);
+    const [isuploading, setIsUploading] = useState(false);
+    const [uploadPercentage, setUploadPercentage] = useState(0);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         console.log(result);
         if (Object.keys(result).length > 0) {
-            navigate("/migratedStaff", { state: { result, fileName } });
+            navigate("/migratedStaff", { state: { result } });
         }
 
     }, [result, navigate]);
+    
+    const handleFileSelection = (file) => {
+        if (file) {
+            setFile(file);
+            setFileName(file.name);
+            setFileSize(file.size);
+            setFileState(!fileState);
+            setIsLoading(false);
+        } else {
+            setFile(null);
+            setFileName('');
+            setFileSize('');
+            setFileState(false);
+            setIsLoading(true);
+            setIsUploading(false);
+        }
+    };
+
+
+
+
+    
     
     
 
@@ -35,24 +57,30 @@ function FileUpload() {
     const uploadFile = async (e) => {
         if (file == null) {
             toast.error("No file chosen", {
-                autoClose: 2000,
+                autoClose: 5000,
                 closeOnClick: true,
                 pauseOnHover: false,
                 theme: "dark",
             });
         }
-        setIsLoading(true);
+        
         console.log(file);
         const formData = new FormData();
         formData.append('file', file);
         
 
         try {
-
+            setIsUploading(true);
             const response = await axios.post('https://localhost:7096/api/staffAPI/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
-                }
+                },
+                onUploadProgress: (progressEvent) => {
+                    const percentCompleted = Math.round(
+                        (progressEvent.loaded * 100) / progressEvent.total
+                    );
+                    setUploadPercentage(percentCompleted);
+                },
             })
             setResult(response.data);
             console.log(response);
@@ -61,98 +89,111 @@ function FileUpload() {
 
             //console.log("Response is ", response.status);
             toast.success('CSV uploaded successfully!', {
-                autoClose: 1000,
+                autoClose: 5000,
                 closeOnClick: true,
                 pauseOnHover: false,
                 theme: "dark",
             });
-            setIsLoading(false);   // Hide loading screen
+            
             
 
         }
         catch (error) {
             console.log(error);
+            setIsUploading(false); // setting isUploading to false to stop the file upload process
             if (error.response.data) {
                 toast.error(error.response.data, {
-                    autoClose: 2000,
+                    autoClose: 5000,
                     closeOnClick: true,
-                    pauseOnHover: false,
+                    pauseOnHover: true,
                     theme: "dark",
                 });
             }
-            setIsLoading(false);   // Hide loading screen
+           
             
 
 
         }
-        setFile(null);
+        
     }
-    const saveFile = (e) => {
-        console.log("hi",e.target.files[0]);
-        if (e.target.files[0] !== undefined) {
-            console.log(e.target.files[0]);
-            setFile(e.target.files[0]);
-            setFileName(e.target.files[0].name);
-            setFileType(e.target.files[0].type);
-            setFileState(!fileState);
-        }
-        else {
-            setFile(null);
-
-        }
-    }
-
+    
 
 
 
 
 
     return (
-        <div>
-            {isLoading ? <Loader /> :
-                <>
-                    <input type="file" accept=".csv" onChange={saveFile}></input>
-                    {
-                        (fileType === "text/csv") ?
-                            <>
+        
 
-                                <Button variant="primary" type="file" onClick={uploadFile}>Upload</Button>
+        < div >
+            
+            <Card className="text-center" style={{ color: 'black', width:'40rem'}} >
+                <Card.Header style={{ backgroundColor: '#e2e2e9', textAlign: 'left', }}><b>Bulk Uploads</b></Card.Header>
+                <Card.Body>
+                    <Card.Title style={{fontSize:"22px"} }>How to upload</Card.Title>
+                    <ol>
+                        <li style={{ fontSize: "18px", textAlign: 'left', }}><Card.Text >
+                            Download a template from <a href="https://docs.google.com/spreadsheets/d/1J2_qX_iSsQkNIdVt5qaD8HOgePeBCVQLrdhGzBng1R8/edit?usp=sharing" target="_blank" rel="noreferrer">here</a>
+                        </Card.Text>
+                        </li>
+                        <li style={{ fontSize: "18px", textAlign: 'left', }}><Card.Text >
+                            Add your data to the template file.
+                            <p style={{ color: '#848491', fontSize: '16px' }}>
+                                <i>If using Excel, make sure to export or save as a .csv</i>
+                            </p>
+                        </Card.Text>
+                        </li>
+                        <li style={{ fontSize: "18px", textAlign: 'left', }}><Card.Text >
+                            Upload it below for processing
+                        </Card.Text>
+                        </li>
+                    </ol>
+                    <p style={{ fontSize: '16px' }}>Need a hand?
+                        <a href="mailto: rohitjindamwar123@gmail.com"> Send an email</a> to our operations team.
+                    </p>
 
-                            </> :
-                            <>
-                                {
-                                    fileState === false ?
-                                        <Button variant="primary" disabled>Upload</Button> :
-                                        <>
-                                            <Button variant="primary" disabled>Upload</Button>
-                                            <p>Choose CSV/text File Only</p>
+                    
 
-                                        </>
-                                }
-                            </>
-                    }
-                    {/*
-                      <Form>
-                        <Form.Group>
-                            <Form.Check
-                                type="checkbox"
-                                label="Make Id Auto Increment"
-                                name="checkbox"
+                    {isLoading ?
+                        <>
+                            {/*  Upload UI component */}
 
-                                
-                                onChange={() => { setIsAutoIncrement(!isAutoIncrement); console.log("checkBox:", isAutoIncrement); }}
-                            />
+                            < UploadUi handleFileSelection={handleFileSelection} />
+
+                            {/*  Upload UI component */}
+                        </> :
+                        <>
+                            {/*  Progress bar UI component */}
+                            <FileProgressBar fileName={fileName} fileSize={fileSize} handleFileSelection={handleFileSelection} />
                             
-                        </Form.Group>
-                    </Form>
-                    */}
-                </>
+                            {/*  Progress bar UI component */}                        </>}
 
 
-            }
+                    {isuploading ?
+                        <div style={{ marginTop: "5px" }}>
+                            <ProgressBar
+                                striped
+                                variant="success"
+                                now={uploadPercentage}
+                                label={`${uploadPercentage}% completed`}
+                            />
+                        </div> :
+                        <></>
+                   }
 
 
-        </div>
+                </Card.Body>
+
+
+                <Card.Footer className="text-muted" style={{ textAlign: 'right' }}>
+                    <Button variant="primary" onClick={uploadFile}>Upload</Button>
+                </Card.Footer>
+
+                
+            </Card>
+        </div >
+
+       
     );
 };
 

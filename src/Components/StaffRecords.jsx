@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
-import { useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios';
+
 
 function StaffRecords() {
 
@@ -13,7 +12,7 @@ function StaffRecords() {
     console.log(records);
     return (
         <div>
-            <h1>Migrated Staff Records Successfully</h1>
+            <h1> <b>({records.length})</b> Staff Members Added Successfully!</h1>
         </div>
     );
 }
