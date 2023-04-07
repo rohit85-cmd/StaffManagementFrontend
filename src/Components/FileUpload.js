@@ -8,9 +8,10 @@ import Card from 'react-bootstrap/Card';
 import UploadUi from './UploadUi/UploadUi';
 import FileProgressBar from './FileProgressBar/FileProgressBar';
 import ProgressBar from 'react-bootstrap/ProgressBar';
+import ErrorMsg from './ErrorMsg/ErrorMsg';
 
 function FileUpload() {
-    const [file, setFile] = useState();
+    const [file, setFile] = useState(null);
     const [fileName, setFileName] = useState('')
     const [fileSize, setFileSize] = useState('')
     const [fileState, setFileState] = useState(false)
@@ -18,6 +19,7 @@ function FileUpload() {
     const [isLoading, setIsLoading] = useState(true);
     const [isuploading, setIsUploading] = useState(false);
     const [uploadPercentage, setUploadPercentage] = useState(0);
+    const [errorMsg, setErrorMsg] = useState('');
 
     const navigate = useNavigate();
 
@@ -36,6 +38,8 @@ function FileUpload() {
             setFileSize(file.size);
             setFileState(!fileState);
             setIsLoading(false);
+            setErrorMsg('');
+
         } else {
             setFile(null);
             setFileName('');
@@ -43,6 +47,7 @@ function FileUpload() {
             setFileState(false);
             setIsLoading(true);
             setIsUploading(false);
+            setErrorMsg('');
         }
     };
 
@@ -55,64 +60,71 @@ function FileUpload() {
 
 
     const uploadFile = async (e) => {
-        if (file == null) {
-            toast.error("No file chosen", {
-                autoClose: 5000,
-                closeOnClick: true,
-                pauseOnHover: false,
-                theme: "dark",
-            });
-        }
         
-        console.log(file);
-        const formData = new FormData();
-        formData.append('file', file);
         
+        if (file) {
+            try {
 
-        try {
-            setIsUploading(true);
-            const response = await axios.post('https://localhost:7096/api/staffAPI/upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
-                onUploadProgress: (progressEvent) => {
-                    const percentCompleted = Math.round(
-                        (progressEvent.loaded * 100) / progressEvent.total
-                    );
-                    setUploadPercentage(percentCompleted);
-                },
-            })
-            setResult(response.data);
-            console.log(response);
+                const formData = new FormData();
+                formData.append('file', file);
+                setIsUploading(true);
+                
+                const response = await axios.post('https://localhost:7096/api/staffAPI/upload', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    onUploadProgress: (progressEvent) => {
+                        const percentCompleted = Math.round(
+                            (progressEvent.loaded * 100) / progressEvent.total
+                        );
+                        setUploadPercentage(percentCompleted);
+                    },
+                })
+                
 
-            
+                console.log(response.data);
 
-            //console.log("Response is ", response.status);
-            toast.success('CSV uploaded successfully!', {
-                autoClose: 5000,
-                closeOnClick: true,
-                pauseOnHover: false,
-                theme: "dark",
-            });
-            
-            
+                setResult(response.data);
 
-        }
-        catch (error) {
-            console.log(error);
-            setIsUploading(false); // setting isUploading to false to stop the file upload process
-            if (error.response.data) {
-                toast.error(error.response.data, {
+
+
+                //console.log("Response is ", response.status);
+                toast.success('CSV uploaded successfully!', {
                     autoClose: 5000,
                     closeOnClick: true,
                     pauseOnHover: true,
                     theme: "dark",
                 });
+
+
+
             }
-           
-            
+            catch (error) {
+                console.log(error);
+                setIsUploading(false); // setting isUploading to false to stop the file upload process
+                if (typeof (error.response.data) === 'object') {
+
+                    var err = error.response.data;
+                    for (var key in err) {
+                        //console.log(key," space :");
+                        //console.log(err[key]);
+                        setErrorMsg("Something wrong with text " + err[key] + " on record line number " + key);
+
+                    }
+
+                }
+                else {
+                    setErrorMsg(error.response.data);
+                }
+                
 
 
+
+
+            }
+        }
+        else {
+            setErrorMsg("No file chosen");
         }
         
     }
@@ -169,7 +181,7 @@ function FileUpload() {
                             {/*  Progress bar UI component */}                        </>}
 
 
-                    {isuploading ?
+                    {isuploading &&
                         <div style={{ marginTop: "5px" }}>
                             <ProgressBar
                                 striped
@@ -177,10 +189,11 @@ function FileUpload() {
                                 now={uploadPercentage}
                                 label={`${uploadPercentage}% completed`}
                             />
-                        </div> :
-                        <></>
+                        </div> 
                    }
 
+
+                    {(errorMsg) ? <ErrorMsg errorMsg={errorMsg} setErrorMsg={setErrorMsg} /> : <></>}
 
                 </Card.Body>
 

@@ -3,8 +3,10 @@
     "",
     "\\src",
     "\\src\\Components",
-    "\\src\\Components\\CssFiles"
+    "\\src\\Components\\ErrorMsg",
+    "\\src\\Components\\FileProgressBar",
+    "\\src\\Components\\UploadUi"
   ],
-  "SelectedNode": "\\src\\App.js",
+  "SelectedNode": "\\src\\Components\\ErrorMsg\\ErrorMsg.jsx",
   "PreviewInSolutionExplorer": false
 }
