@@ -1,22 +1,37 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './ErrorMsg.css'
 
 function ErrorMsg(props) {
-    const [isErrorVisible, setIsErrorVisible] = useState(true);
-    const { errorMsg, setErrorMsg } = props;
-    //console.log("hi", ErrorMsg);
+    const { index, error,  isErrorVisibleArray, setIsErrorVisibleArray } = props;
+
+   
+    
     const handleClose = () => {
-        setIsErrorVisible(false); // Set error message visibility to false when close icon is clicked
-        setErrorMsg(null); // Set errorMsg prop to null when close icon is clicked
+        // Update the isErrorVisibleArray for the specific key
+        const updatedIsErrorVisibleArray = [...isErrorVisibleArray];
+        updatedIsErrorVisibleArray[index] = false;
+        setIsErrorVisibleArray(updatedIsErrorVisibleArray);
+        
+       
+        
     };
     return (
         // Rendering error message only if isErrorVisible is true
-        isErrorVisible && (
-            <div className="error-msg">
-                <p>{errorMsg}</p>
-                <i className="bi bi-x-circle-fill" onClick={handleClose}></i>
-            </div>
-        )
+        <>
+
+            {console.log("isErrorArray Key:", isErrorVisibleArray[index])}
+            {isErrorVisibleArray && isErrorVisibleArray[index] && (
+                <div className="error-msg">
+
+                    <i className="column bi bi-info-circle-fill"></i>
+                    <p>{console.log(error)} {error}</p>
+                    <i className="column bi bi-x-circle" onClick={handleClose}></i>
+                </div>
+
+            )}
+                
+        </>
+        
     );
 }
 

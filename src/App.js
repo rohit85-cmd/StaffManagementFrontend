@@ -2,7 +2,8 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from 'react-toastify';
-import Main from './Components/FileUpload';
+import LandingPage from './Components/Main';
+
 import {Route, Routes } from 'react-router-dom'
 import StaffRecords from './Components/StaffRecords';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -13,9 +14,8 @@ function App() {
         <div className="App App-header">
             <ToastContainer />
             <Routes>
-                <Route path="/" element={<Main />} />
+                <Route path="/" element={<LandingPage />} />
                 
-                <Route path="/migratedStaff" element={<StaffRecords />} />
 
                 
             </Routes>
