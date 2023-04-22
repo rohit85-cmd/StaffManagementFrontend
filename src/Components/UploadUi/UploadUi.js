@@ -33,7 +33,7 @@ function UploadUi(props) {
     return (
 
         <div className="drop-target" onDrop={drop} onDragOver={dragOverHandler}>
-                <input type="file" accept=".csv" id="file-upload" onChange={selectFile} style={{ display: 'none' }} />
+                <input type="file" accept=".csv" id="file-upload" onChange={selectFile} required style={{ display: 'none' }} />
 
                 <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
 
@@ -43,7 +43,8 @@ function UploadUi(props) {
                 
                 
                 
-                <p>Drag and drop files here, or <label htmlFor="file-upload" id="file-browser"> browse</label> your computer.</p>
+            <p>Drag and drop files here, or <label htmlFor="file-upload" id="file-browser"> browse</label> your computer.
+            </p>
             </div>
         
     );

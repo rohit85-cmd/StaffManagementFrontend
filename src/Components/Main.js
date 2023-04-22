@@ -9,6 +9,7 @@ import ProgressBar from 'react-bootstrap/ProgressBar';
 import ErrorMsg from './ErrorMsg/ErrorMsg';
 import Modal from 'react-bootstrap/Modal';
 import SuccessMsg from './SuccessMsg/SuccessMsg';
+import './Main.css'
 
 
 
@@ -22,20 +23,11 @@ function CenteredModal(props) {
     const [isuploading, setIsUploading] = useState(false);
     const [uploadPercentage, setUploadPercentage] = useState(0);
     const [errorMsg, setErrorMsg] = useState([]);
-    const [isErrorVisibleArray, setIsErrorVisibleArray] = useState([]);
 
-    
-    
-
-    
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        console.log("Array: ", isErrorVisibleArray) 
 
-    }, [isErrorVisibleArray]);
-    
     useEffect(() => {
         console.log(result);
         if (Object.keys(result).length > 0) {
@@ -45,9 +37,7 @@ function CenteredModal(props) {
     }, [result, navigate]);
 
     const handleButtonCancel = () => {
-        // Update errorMsg and isErrorVisibleArray to empty values
-        setErrorMsg([]);
-        setIsErrorVisibleArray([]);
+        handleFileSelection(null)
 
         // Call props.onHide
         props.onHide();
@@ -95,9 +85,10 @@ function CenteredModal(props) {
                 setResult(response.data);
                 // Update staffRecords count in Main function
                 props.handleStaffRecordsCount(response.data.staffRecords.length);
+                props.handleSuccessPopUp();
                 props.onSuccess();
                 props.onHide(); // Hide the modal once file is successfully uploaded
-                //props.handleSuccessShow();
+                
 
                 handleFileSelection(null);
             }
@@ -105,32 +96,17 @@ function CenteredModal(props) {
                 console.log(error);
                 setIsUploading(false); // setting isUploading to false to stop the file upload process
                 setErrorMsg(error.response.data);
-                //setIsErrorVisibleArray(new Array(errorMsg.length).fill(true));
-                console.log(errorMsg);
-
-                setIsErrorVisibleArray(new Array(error.response.data.length).fill(true));
-
-
-
-
-
             }
         }
         else {
             setErrorMsg(["No file chosen"]);
-            setIsErrorVisibleArray(new Array(1).fill(true));
+           
         }
         
     }
-    
-
-
-
 
 
     return (
-        
-
         < Modal
             {...props}
             size="lg"
@@ -146,10 +122,10 @@ function CenteredModal(props) {
                 </Modal.Title>
             </Modal.Header>
             {/*---------------Modal Body ---------------*/ }
-            <Modal.Body>
+            <Modal.Body className="modal-body">
                 <h4>How to upload</h4>
                 <ol>
-                    <li style={{ fontSize: "18px", textAlign: 'left', }}>
+                    <li style={{ fontSize: "18px", textAlign: 'left' }}>
                         Download a template from <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vTU_XBjtp-QTh4f4gwyD1ZTAWaA61GgLAuki05SAvAVPn9mV7kpFpuHt_oRXfluv1ZxHwxzGnrk3z1i/pub?gid=929489215&single=true&output=csv" target="_blank" rel="noreferrer" >here</a>
                     </li>
 
@@ -198,27 +174,20 @@ function CenteredModal(props) {
                 <div style={{ marginTop:"8px", maxHeight: "100px", overflowY: "auto" }}>
                     {errorMsg.length > 0 &&
                         errorMsg.map((err, index) => {
-                            if (isErrorVisibleArray.length > index && isErrorVisibleArray[index]) {
+                            
                                 return (
                                     <ErrorMsg
                                         key={index}
-                                        index={index}
                                         error={err}
-                                        isErrorVisibleArray={isErrorVisibleArray}
-                                        setIsErrorVisibleArray={setIsErrorVisibleArray}
                                     />
                                 );
-                            } else {
-                                return null;
-                            }
+                            
                         })}
                 </div>
-
 
             </Modal.Body>
 
             { /*---------------Modal Footer ---------------*/ }
-
 
             <Modal.Footer>
                 <Button
@@ -243,17 +212,21 @@ function Main() {
     
 
     const handleStaffRecordsCount = (count) => {
-        // Do something with the count of staffRecords
         setTotalStaffCount(count);
     }
-
+    const handleSuccessPopUp = () => {
+        setSuccessModalShow(true);
+    }
+    const closeSuccessPopUp = () => {
+        setSuccessModalShow(false);
+    }
     return (
         <>   
             {isSuccessfulMigration &&
                 <SuccessMsg
                     show={successModalShow}
                     
-                    onHide={() => setSuccessModalShow(false)}
+                    onHide={() => closeSuccessPopUp}
                     totalStaffCount={totalStaffCount}
                     
                     
@@ -268,13 +241,8 @@ function Main() {
                 onHide={() => setModalShow(false)}
                 onSuccess={() => setIsSuccessfulMigration(true)}
                 handleStaffRecordsCount={handleStaffRecordsCount}
-                //handleSuccessShow={setSuccessModalShow (true)}
-                
-                
+                handleSuccessPopUp={handleSuccessPopUp}  
             />
-
-
-            
         </>
     );
 }

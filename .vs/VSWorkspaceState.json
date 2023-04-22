@@ -3,8 +3,9 @@
     "",
     "\\src",
     "\\src\\Components",
-    "\\src\\Components\\SuccessMsg"
+    "\\src\\Components\\FileProgressBar",
+    "\\src\\Components\\UploadUi"
   ],
-  "SelectedNode": "\\src\\Components\\SuccessMsg\\SuccessMsg.css",
+  "SelectedNode": "\\src\\Components\\FileProgressBar\\FileProgressBar.js",
   "PreviewInSolutionExplorer": false
 }
