@@ -10,20 +10,30 @@ import ErrorMsg from './ErrorMsg/ErrorMsg';
 import Modal from 'react-bootstrap/Modal';
 import SuccessMsg from './SuccessMsg/SuccessMsg';
 import './Main.css'
+import { useSelector, useDispatch } from 'react-redux'
+import { StaffUpdate, IsSuccessfulMigration, FileStatus } from '../Redux/Actions/index'
+
 
 
 
 function CenteredModal(props) {
-    const [file, setFile] = useState(null);
-    const [fileName, setFileName] = useState('')
-    const [fileSize, setFileSize] = useState('')
+    //const [file, setFile] = useState(null);
+    //const [fileName, setFileName] = useState('')
+    //const [fileSize, setFileSize] = useState('')
     const [fileState, setFileState] = useState(false)
     const [result, setResult] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [isuploading, setIsUploading] = useState(false);
     const [uploadPercentage, setUploadPercentage] = useState(0);
     const [errorMsg, setErrorMsg] = useState([]);
+    const file = useSelector((state) => state.changeFile.file);
+    const fileName = useSelector((state) => state.changeFile.fileName);
+    const fileSize = useSelector((state) => state.changeFile.fileSize);
 
+
+
+
+    const dispatch = useDispatch();
 
     const navigate = useNavigate();
 
@@ -45,17 +55,13 @@ function CenteredModal(props) {
     
     const handleFileSelection = (file) => {
         if (file) {
-            setFile(file);
-            setFileName(file.name);
-            setFileSize(file.size);
+            dispatch(FileStatus(file));
             setFileState(!fileState);
             setIsLoading(false);
             setErrorMsg([]);
 
         } else {
-            setFile(null);
-            setFileName('');
-            setFileSize('');
+            dispatch(FileStatus(null));
             setFileState(false);
             setIsLoading(true);
             setIsUploading(false);
@@ -207,12 +213,15 @@ function CenteredModal(props) {
 function Main() {
     const [modalShow, setModalShow] = useState(false);
     const [successModalShow, setSuccessModalShow] = useState(false);
-    const [isSuccessfulMigration, setIsSuccessfulMigration] = useState(false);
-    const [totalStaffCount, setTotalStaffCount] = useState(0);
-    
+
+    const totalStaffCount = useSelector((state) => state.UpdateStaffCount.staffcount);
+    const isSuccessfulMigration = useSelector((state) => state.UpdateStaffCount.isSuccessfulMigration);
+
+    const dispatch = useDispatch();
 
     const handleStaffRecordsCount = (count) => {
-        setTotalStaffCount(count);
+        
+        dispatch(StaffUpdate(count));
     }
     const handleSuccessPopUp = () => {
         setSuccessModalShow(true);
@@ -232,14 +241,21 @@ function Main() {
                     
                 />
             }
-            <Button variant="primary" onClick={() => setModalShow(true)}>
+            <Button
+                variant="primary"
+                onClick={
+                    () => setModalShow(true)
+                    
+                }
+            >
                 Bulk Staff Upload 
+                
             </Button>
 
             <CenteredModal
                 show={modalShow}
                 onHide={() => setModalShow(false)}
-                onSuccess={() => setIsSuccessfulMigration(true)}
+                onSuccess={() => dispatch(IsSuccessfulMigration())}
                 handleStaffRecordsCount={handleStaffRecordsCount}
                 handleSuccessPopUp={handleSuccessPopUp}  
             />

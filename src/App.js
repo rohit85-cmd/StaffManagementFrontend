@@ -5,8 +5,8 @@ import { ToastContainer } from 'react-toastify';
 import LandingPage from './Components/Main';
 
 import {Route, Routes } from 'react-router-dom'
-import StaffRecords from './Components/StaffRecords';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+
 
 
 function App() {
